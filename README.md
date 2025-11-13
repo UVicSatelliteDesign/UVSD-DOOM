@@ -1,3 +1,27 @@
+# UVSD DOOM README
+
+### Build Code
+```
+cd doomgeneric/
+make
+```
+
+### Download doom shareware
+```
+wget https://distro.ibiblio.org/slitaz/sources/packages/d/doom1.wad
+```
+
+### Run DOOM
+```
+./doomgeneric
+```
+
+If you put your iwad file somewhere else you can specify it with the -iwad command
+```
+./doomgeneric -iwad <Path to your iwad file>
+```
+
+
 # doomgeneric
 The purpose of doomgeneric is to make porting Doom easier.
 Of course Doom is already portable but with doomgeneric it is possible with just a few functions.
