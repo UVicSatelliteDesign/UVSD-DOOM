@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include <stdbool.h>
+#include <SDL2/SDL.h>
 
 void DG_Init() {
   // Initialize your platfrom (create window, framebuffer, etc...).
@@ -17,12 +18,14 @@ void DG_DrawFrame(uint32_t ms) {
   // Frame is ready in DG_ScreenBuffer. Copy it to your platform's screen.
 }
 
-void DG_SleepMs() {
-  // sleep for ms
+void DG_SleepMs(uint32_t ms)
+{
+  SDL_Delay(ms);
 }
 
-uint32_t DG_GetTicksMs() {
-  // The ticks passed since launch in milliseconds.
+uint32_t DG_GetTicksMs()
+{
+  return SDL_GetTicks();
 }
 
 int DG_GetKey(int *pressed, unsigned char *doomKey) {
