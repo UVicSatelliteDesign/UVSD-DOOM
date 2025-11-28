@@ -141,3 +141,83 @@ static void handleKeyInput() {
     }
   }
 }
+
+// Provide keyboard events.
+int DG_GetKey(int *pressed, unsigned char *doomKey) {
+  if (s_KeyQueueReadIndex == s_KeyQueueWriteIndex) {
+    // key queue is empty
+    return 0;
+  } else {
+    unsigned short keyData = s_KeyQueue[s_KeyQueueReadIndex];
+    s_KeyQueueReadIndex++;
+    s_KeyQueueReadIndex %= KEYQUEUE_SIZE;
+
+    *pressed = keyData >> 8;
+    *doomKey = keyData & 0xFF;
+
+    return 1;
+  }
+
+  return 0;
+}
+
+// input mechanism for testing key inputs
+void test_input_system() {
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    printf("SDL init failed: %s\n", SDL_GetError());
+    return;
+  }
+
+  // Creates an SDL window with the following parts
+  SDL_Window *window = SDL_CreateWindow(
+      "Doom Input Test",      // Window title
+      SDL_WINDOWPOS_CENTERED, // X position (centered on screen)
+      SDL_WINDOWPOS_CENTERED, // Y position (centered on screen)
+      640, 480,               // Width, height in pixels
+      SDL_WINDOW_SHOWN        // Show window immediately
+  );
+
+  int running = 1;
+  while (running) {
+    handleKeyInput();
+
+    // Process all queued keys
+    while (s_KeyQueueReadIndex != s_KeyQueueWriteIndex) {
+      unsigned short keyData = s_KeyQueue[s_KeyQueueReadIndex];
+      int pressed = (keyData >> 8) & 0xFF; // Extract press/release flag
+      int key = keyData & 0xFF;            // Extract key code
+
+      printf("%s: %d (0x%02X)\n", pressed ? "PRESS  " : "RELEASE", key, key);
+
+      if (key == KEY_ESCAPE)
+        running = 0; // Exit on ESC
+
+      s_KeyQueueReadIndex++;
+      s_KeyQueueReadIndex %= KEYQUEUE_SIZE; // Wrap around with mod
+    }
+
+    SDL_Delay(16); // Sleep ~16ms which is about 60fps
+  }
+
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+}
+
+int main(int argc, char *argv[]) {
+  //
+  if (argc > 1 && strcmp(argv[1], "--test-input") == 0) {
+    test_input_system();
+    return 0;
+  }
+
+  // Normal Doom startup will go here
+  printf("Starting Doom...\n");
+
+  doomgeneric_Create(argc, argv);
+
+  for (int i = 0;; i++) {
+    doomgeneric_Tick();
+  }
+
+  return 0;
+}
